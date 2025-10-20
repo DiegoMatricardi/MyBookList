@@ -15,7 +15,7 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://admin:123456@mongo:27017/MyBookList  
+      ME_CONFIG_MONGODB_URL: mongodb://admin:123456@mongo:27017/MyBookList?authSource=admin  
       ME_CONFIG_BASICAUTH_ENABLED: true
       ME_CONFIG_BASICAUTH_USERNAME: user
       ME_CONFIG_BASICAUTH_PASSWORD: pass

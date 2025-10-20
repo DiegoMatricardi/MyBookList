@@ -29,6 +29,10 @@ class Livro{
         return await LivroModel.findById(id);
     }
 
+    static async findByCategoria(categoriaId){
+        return await LivroModel.find({ categoria: categoriaId }).populate('categoria');
+    }
+
     static async update(id, dados){
         return await LivroModel.findByIdAndUpdate(id, dados, {new: true});
     }
