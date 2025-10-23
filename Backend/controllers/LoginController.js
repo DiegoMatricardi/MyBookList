@@ -22,11 +22,7 @@ class LoginController{
 
             return res.status(200).json({
                 message: "Login realizado com sucesso!",
-                usuario: {
-                    id: usuario._id,
-                    nome: usuario.nome,
-                    email: usuario.email
-                }
+                usuario
             });
 
         } catch (error) {

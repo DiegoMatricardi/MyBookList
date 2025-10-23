@@ -6,6 +6,7 @@ import helmet from "helmet";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
+import cors from "cors"
 
 const urlencodedMiddleware = express.urlencoded({extended: true});
 const jsonMiddleware = express.json();
@@ -19,11 +20,16 @@ const rateLimitMiddleware = rateLimit({
 const logFile = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags:'a'});
 const morganMiddleware = morgan('combined', { stream: logFile});
 
+const corsMiddleware = cors({
+    origin: '*'
+});
+
 export {
     urlencodedMiddleware,
     jsonMiddleware,
     securityMiddleware,
     compressionMiddleware, 
     rateLimitMiddleware,
-    morganMiddleware
+    morganMiddleware,
+    corsMiddleware
 };

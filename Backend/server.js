@@ -7,7 +7,8 @@ import {
   securityMiddleware,
   compressionMiddleware,
   rateLimitMiddleware,
-  morganMiddleware
+  morganMiddleware,
+  corsMiddleware
 } from './middlewares/middlewares.js';
 import Database from './config/db.js';
 import usuarioRoutes from './routes/usuarioRoutes.js';
@@ -23,19 +24,16 @@ const port = process.env.PORT || 3000;
 
 Database.connect();
 
-app.use(cors({
-  origin: "http://localhost:8080" // porta do Vue
-}));
-
 app.use(securityMiddleware);      
 app.use(compressionMiddleware);   
 app.use(rateLimitMiddleware);     
 app.use(morganMiddleware);        
 app.use(jsonMiddleware);          
 app.use(urlencodedMiddleware);    
-app.use(usuarioRoutes);
-app.use(livroRoutes);
-app.use(categoriaRoutes);
+app.use(corsMiddleware);
+app.use("/Usuario", usuarioRoutes);
+app.use("/Livro", livroRoutes);
+app.use("/Categoria", categoriaRoutes);
 app.use(loginRoutes);
 
 

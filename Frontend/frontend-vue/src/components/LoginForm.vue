@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -24,26 +26,22 @@ export default {
     async handleLogin() {
       this.error = "";
       try {
-        const response = await fetch("http://localhost:3000/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: this.email, senha: this.senha })
+        const response = await axios.post("http://localhost:3000/login", {
+          email: this.email,
+          senha: this.senha
         });
 
-        const data = await response.json();
+        console.log("Usuário logado:", response.data);
 
-        if (!response.ok) {
-          this.error = data.message || "Erro ao logar";
-          return;
-        }
-
-        console.log("Usuário logado:", data);
-        localStorage.setItem("usuario", JSON.stringify(data.usuario));
+        localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
         this.$router.push("/dashboard");
-
       } catch (err) {
+        if (err.response) {
+          this.error = err.response.data.message || "Erro ao logar";
+        } else {
+          this.error = "Erro de conexão com o backend";
+        }
         console.error(err);
-        this.error = "Erro de conexão com o backend";
       }
     }
   }

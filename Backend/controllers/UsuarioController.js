@@ -1,5 +1,6 @@
 import path from "path";
 import Usuario from "../models/usuario.js";
+import Livro from "../models/livros.js";
 import __dirname from "../utils/pathUtils.js";
 
 class UsuarioController{
@@ -71,6 +72,45 @@ class UsuarioController{
         }catch(error){
             console.error("Erro ao remover usuário:", error);
             return res.status(500).json({ message: "Erro interno ao remover usuário." });
+        }
+    }
+
+    static async avaliarLivro(req, res) {
+        try {
+            const { usuarioId, livroId } = req.params;
+            const { nota } = req.body;
+
+            const usuario = await Usuario.findById(usuarioId);
+            if (!usuario) return res.status(404).json({ message: "Usuário não encontrado!" });
+
+            const livro = await Livro.findById(livroId);
+            if (!livro) return res.status(404).json({ message: "Livro não encontrado!" });
+
+            // Adiciona nota e id do usuário no livro
+            livro.notas.push(nota);
+            if (!livro.pessoas.includes(usuarioId)) livro.pessoas.push(usuarioId);
+            await livro.save();
+
+            // Adiciona livro ao histórico do usuário com a nota
+            const livroExistente = usuario.livros.find(l => l.livro.toString() === livroId);
+            if (!livroExistente) {
+                usuario.livros.push({ livro: livroId, nota }); // aqui é o objeto completo
+            } else {
+                // Atualiza nota se o livro já existir
+                livroExistente.nota = nota;
+            }
+
+            await usuario.save();
+
+            res.status(200).json({
+                message: "Avaliação registrada com sucesso!",
+                livro,
+                usuario
+            });
+
+        } catch (error) {
+            console.error("Erro ao avaliar livro:", error);
+            res.status(500).json({ message: "Erro interno ao avaliar livro" });
         }
     }
 
