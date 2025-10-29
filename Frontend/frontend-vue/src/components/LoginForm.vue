@@ -7,6 +7,7 @@
       <input v-model="senha" type="password" placeholder="Senha" />
       <button @click="handleLogin">Entrar</button>
       <p v-if="error" class="error">{{ error }}</p>
+      <p>Ainda não tem conta? <router-link to="/cadastro">Cadastre-se</router-link></p>
     </div>
   </div>
 </template>

@@ -7,6 +7,9 @@ const UsuarioSchema = new mongoose.Schema(
         telefone: { type: String, required: true, trim: true },
         email: { type: String, required: true, unique: true, lowercase: true, trim: true },
         senha: { type: String, required: true },
+        cep: { type: String, required: true, trim: true },
+        cidade: { type: String, required: true, trim: true },
+        endereco: { type: String, required: true, trim: true },
         livros: [
             {
                 livro: { type: mongoose.Schema.Types.ObjectId, ref: "Livro", required: true },

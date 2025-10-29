@@ -30,13 +30,17 @@ class UsuarioController{
 
     static async createUsuario(req, res){
         try{
-            const {nome, cpf, telefone, email, senha} = req.body;
+            const {nome, cpf, telefone, email, senha,cep,cidade,endereco} = req.body;
+            console.log(req.body);
             const novoUsuario = new Usuario({
                 nome,
                 cpf,
                 telefone,
                 email,
-                senha
+                senha,
+                cep,
+                cidade,
+                endereco
             });
             const usuarioSalvo = await novoUsuario.save();
             return res.status(201).json(usuarioSalvo);

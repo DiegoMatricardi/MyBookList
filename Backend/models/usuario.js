@@ -1,13 +1,16 @@
 import UsuarioModel from "./usuarioSchema.js";
 
 class Usuario{
-    constructor({ nome, cpf, telefone, email, senha, livros = [] }) {
+    constructor({ nome, cpf, telefone, email, senha, livros = [],cep,cidade,endereco }) {
         this.nome = nome;
         this.cpf = cpf;
         this.telefone = telefone;
         this.email = email;
         this.senha = senha;
         this.livros = livros; 
+        this.cep = cep;
+        this.cidade = cidade;
+        this.endereco = endereco;
     }
 
     async save(){
@@ -17,7 +20,10 @@ class Usuario{
             telefone: this.telefone,
             email: this.email,
             senha: this.senha,
-            livros: this.livros
+            livros: this.livros,
+            cep: this.cep,
+            cidade: this.cidade,
+            endereco: this.endereco
         });
         return await novoUsuario.save();
     }
