@@ -1,8 +1,10 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import CadastroCategoria from '@/views/CadastroCategoriaview.vue';
+import CadastroView from '@/views/CadastroView.vue';
+import DashboardView from '@/views/DashboardView.vue';
 import LoginView from '@/views/LoginView.vue';
-import DashboardView from '@/views/DashboardView.vue'
-import PerfilView from '@/views/PerfilView.vue'
-import CadastroView from '@/views/CadastroView.vue'
+import PerfilView from '@/views/PerfilView.vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
+
 const routes = [
   {
     path: '/',
@@ -23,6 +25,11 @@ const routes = [
     path: '/cadastro',
     name: 'Cadastro',
     component: CadastroView
+  },
+  {
+    path: '/cadastro-categoria',
+    name: 'CadastroCategoria',
+    component: CadastroCategoria
   }
 ]
 

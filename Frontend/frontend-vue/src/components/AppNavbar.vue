@@ -20,6 +20,11 @@
         <i class="icon-user"></i>
         <span>Perfil</span>
       </router-link>
+      
+      <router-link to="/cadastro-categoria" class="nav-item" active-class="active">
+        <i class="icon-user"></i>
+        <span>Categorias</span>
+      </router-link>
     </nav>
 
     <div class="bottom">
