@@ -22,7 +22,7 @@ class Livro{
     }
 
     static async findAll(){
-        return await LivroModel.find();
+        return await LivroModel.find().populate('categoria');
     }
 
     static async findById(id){

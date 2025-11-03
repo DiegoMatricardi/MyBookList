@@ -3,6 +3,7 @@ import CadastroView from '@/views/CadastroView.vue';
 import DashboardView from '@/views/DashboardView.vue';
 import LoginView from '@/views/LoginView.vue';
 import PerfilView from '@/views/PerfilView.vue';
+import LivrosDashboardView from '@/views/LivrosDashboardView.vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 const routes = [
@@ -30,6 +31,11 @@ const routes = [
     path: '/cadastro-categoria',
     name: 'CadastroCategoria',
     component: CadastroCategoria
+  },
+  {
+    path: '/livros',
+    name: 'LivroDashboard',
+    component: LivrosDashboardView
   }
 ]
 
