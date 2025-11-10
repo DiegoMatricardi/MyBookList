@@ -11,7 +11,6 @@
         <p><strong>CPF:</strong> {{ usuario.cpf }}</p>
         <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
     </div>
-
     <div class="user-books" v-if="usuario.livros && usuario.livros.length">
         <h3>Meus Livros</h3>
         <ul>
@@ -75,7 +74,6 @@ export default {
   font-size: 32px;
 }
 
-/* Dados do usuário */
 .perfil-info {
   display: flex;
   flex-direction: column;
@@ -114,7 +112,6 @@ export default {
   margin: 4px 0;
 }
 
-/* Lista de livros */
 .user-books {
   margin-top: 30px;
   width: 100%;

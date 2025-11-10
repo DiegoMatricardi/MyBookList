@@ -26,27 +26,27 @@
             };
         },
         methods: {
-            async handleCategoria(){
-                this.error=""
-                this.success=""
-                try{
-                    const response = await axiosInstance.post("/categoria", {
-                        nome: this.nome
-                    });
-                    if(response.status===201){
-                      this.success="Categoria "+this.nome +" cadastrada com sucesso!"
-                      this.nome=""
-                    }
-                    else{
-                      this.error="Erro ao cadastrar categoria"
-                    }
-            }catch(err){
-                if(err.response){
-                    this.error= err.response.data.message || "Erro ao cadastrar categoria"
-                }else{
-                    this.error="Erro de conexão com o backend"
+          async handleCategoria(){
+            this.error=""
+            this.success=""
+            try{
+              const response = await axiosInstance.post("/categoria", {
+                nome: this.nome
+              });
+                if(response.status===201){
+                  this.success="Categoria "+this.nome +" cadastrada com sucesso!"
+                  this.nome=""
                 }
-                console.error(err)
+                else{
+                  this.error="Erro ao cadastrar categoria"
+                }
+            }catch(err){
+              if(err.response){
+                  this.error= err.response.data.message || "Erro ao cadastrar categoria"
+              }else{
+                  this.error="Erro de conexão com o backend"
+              }
+              console.error(err)
             }
     }
         }

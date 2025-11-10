@@ -4,6 +4,7 @@ import DashboardView from '@/views/DashboardView.vue';
 import LoginView from '@/views/LoginView.vue';
 import PerfilView from '@/views/PerfilView.vue';
 import LivrosDashboardView from '@/views/LivrosDashboardView.vue';
+import LivroCadastroView from '@/views/LivroCadastroView.vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 const routes = [
@@ -36,7 +37,13 @@ const routes = [
     path: '/livros',
     name: 'LivroDashboard',
     component: LivrosDashboardView
+  },
+  {
+    path: "/livros/cadastrar",
+    name: "LivroCadastroView",
+    component: LivroCadastroView
   }
+
 ]
 
 const router = createRouter({

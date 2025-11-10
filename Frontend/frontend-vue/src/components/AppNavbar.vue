@@ -16,15 +16,21 @@
         <span>Livros</span>
       </router-link>
 
+      <router-link
+        v-if="usuario && usuario.email === 'admin@email.com'"
+        to="/cadastro-categoria"
+        class="nav-item"
+        active-class="active"
+      >
+        <i class="icon-category"></i>
+        <span>Categorias</span>
+      </router-link>
+
       <router-link to="/perfil" class="nav-item" active-class="active">
         <i class="icon-user"></i>
         <span>Perfil</span>
       </router-link>
       
-      <router-link to="/cadastro-categoria" class="nav-item" active-class="active">
-        <i class="icon-user"></i>
-        <span>Categorias</span>
-      </router-link>
     </nav>
 
     <div class="bottom">
@@ -37,16 +43,33 @@
 </template>
 
 <script>
-  export default {
-    name: "AppNavbar",
-    methods: {
-      logout() {
-        localStorage.removeItem("usuario");
-        this.$router.push("/");
+export default {
+  name: "AppNavbar",
+  data() {
+    return {
+      usuario: null
+    };
+  },
+  mounted() {
+    const user = localStorage.getItem("usuario");
+    if (user) {
+      try {
+        this.usuario = JSON.parse(user);
+        console.log("Usuário carregado:", this.usuario); 
+      } catch (e) {
+        console.error("Erro ao ler usuário:", e);
       }
     }
-  };
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem("usuario");
+      this.$router.push("/");
+    }
+  }
+};
 </script>
+
 
 <style scoped>
   .navbar {
@@ -117,6 +140,9 @@
   }
   .icon-logout::before {
     content: "🚪";
+  }
+  .icon-category::before {
+    content: "🗂️"; 
   }
 
   .bottom {
