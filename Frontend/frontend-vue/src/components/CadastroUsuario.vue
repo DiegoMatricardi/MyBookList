@@ -18,6 +18,7 @@
 
       <p v-if="error" class="error">{{ error }}</p>
       <p v-if="success" class="success">{{ success }}</p>
+       <p>Deseja voltar pro login ? <router-link to="/"> Login</router-link></p>
     </div>
   </div>
 </template>

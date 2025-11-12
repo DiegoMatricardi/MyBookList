@@ -11,11 +11,11 @@
         <p><strong>CPF:</strong> {{ usuario.cpf }}</p>
         <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
     </div>
-    <div class="user-books" v-if="usuario.livros && usuario.livros.length">
+    <div class="user-books" v-if=" livros && usuario.livros.length">
         <h3>Meus Livros</h3>
         <ul>
-        <li v-for="(livro, index) in usuario.livros" :key="index">
-            <strong>{{ livro.titulo }}</strong> - {{ livro.autor }}
+        <li v-for="(livro,index) in livros" :key="index">
+            <strong>{{ livro.nome }}</strong> - {{ usuario.livros[index].nota }} ⭐
         </li>
         </ul>
     </div>
@@ -29,12 +29,22 @@
 </template>
 
 <script>
+import axiosInstance from '@/services/axiosInstance';
+
 export default {
   name: "PerfilView",
   data() {
     return {
-      usuario: null
+      usuario: null,
+      livros:[]
     };
+  },watch:{
+    usuario:{
+      handler(){
+         this.searchbooks();
+      },
+      immediate:true
+    }
   },
   computed: {
     initials() {
@@ -53,7 +63,26 @@ export default {
     } else {
       this.usuario = JSON.parse(user);
     }
+  },
+  methods:{
+    async searchbooks(){
+    try{
+      const livro=this.usuario.livros;
+      console.log(livro[0].livro)
+      for(let i=0;i<livro.length;i++){
+        const resp=await axiosInstance.get(`/livro/${livro[i].livro}`)
+        this.livros.push(resp.data);
+      }
+      console.log(this.livros[0].nome);
+      return this.livros;
+      }
+      catch(err){
+        console.error("Erro ao buscar livros:", err);
+        return [];
+      }
   }
+  }
+  
 };
 </script>
 

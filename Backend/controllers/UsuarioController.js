@@ -98,7 +98,7 @@ class UsuarioController {
         return res.status(404).json({ message: "Livro não encontrado!" });
 
       livro.notas.push(nota);
-      if (!livro.pessoas.includes(usuarioId)) l
+      if (!livro.pessoas.includes(usuarioId)) 
         livro.pessoas.push(usuarioId);
       await livro.save();
 
