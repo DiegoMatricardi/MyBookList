@@ -44,6 +44,7 @@
           <p><strong>Categoria:</strong> {{ livro.categoria?.nome || "Sem categoria" }}</p>
           <p>{{ livro.descricao || "Sem descrição" }}</p>
           <button class="botao-exibir" @click="abrirLivro(livro)">Detalhes</button>
+          <button v-if="usuario && usuario.email === 'admin@email.com'" class="botao-excluir" @click="excluirLivro(livro)">Excluir</button>
         </div>
       </div>
     </div>
@@ -78,6 +79,7 @@
   import axios from "axios";
   import ModalComponent from "@/components/ModalComponent.vue";
   import AvaliacaoModal from "@/components/AvaliacaoModal.vue";
+  import { eventBus } from '@/services/eventBus';
   export default {
     components: { Navbar,  ModalComponent, AvaliacaoModal},
     data() {
@@ -163,9 +165,54 @@
       abrirAvaliacao() {
         this.modalAvaliacaoAberto = true;
       },
-      avaliacaoConcluida() {
-        this.carregarLivros(); 
+      async avaliacaoConcluida(nota) {
+        try {
+          await this.carregarLivros();
+
+          const atualizado = this.livros.find(l => l._id === this.livroSelecionado._id);
+          if (atualizado) {
+            this.livroSelecionado = atualizado;
+            this.media = await this.calcularMedia(atualizado.notas);
+          }
+
+          const user = JSON.parse(localStorage.getItem("usuario"));
+          if (user) {
+            const idx = user.livros.findIndex(l => l.livro === this.livroSelecionado._id);
+            if (idx !== -1) {
+              user.livros[idx].nota = nota;
+            } else {
+              user.livros.push({
+                livro: this.livroSelecionado._id,
+                nota: nota
+              });
+            }
+            localStorage.setItem("usuario", JSON.stringify(user));
+            this.usuario = { ...user };
+            eventBus.update = !eventBus.update;
+          }
+
+          this.modalAvaliacaoAberto = false;
+        } catch (error) {
+          console.error("Erro ao atualizar após avaliação:", error);
+        }
       },
+      async excluirLivro(livro) {
+        if (!confirm(`Tem certeza que deseja excluir o livro "${livro.nome}"?`)) {
+          return;
+        }
+        try {
+          await axios.delete(`http://localhost:3000/livro/${livro._id}`);
+          
+          this.livros = this.livros.filter(l => l._id !== livro._id);
+          this.filtrados = this.filtrados.filter(l => l._id !== livro._id);
+
+          alert("Livro excluído com sucesso!");
+        } catch (error) {
+          console.error("Erro ao excluir livro:", error);
+          alert("Erro ao excluir o livro. Tente novamente.");
+        }
+      }
+
     }
   };
 </script>
@@ -237,6 +284,22 @@
 
   .botao-exibir:hover {
     background: #0b1f79;
+  }
+
+  .botao-excluir {
+    background: #c91616;
+    color: #fff;
+    border: none;
+    width: 95px;
+    font-size: 20px;
+    font-weight: normal;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .botao-exibir:hover {
+    background: #da0707;
   }
 
   .botao-avaliar {

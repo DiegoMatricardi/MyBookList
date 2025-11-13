@@ -1,6 +1,8 @@
 import path from "path";
 import Livro from "../models/livros.js";
+import Usuario from "../models/usuario.js";
 import Categoria from "../models/categoria.js";
+import UsuarioController from "./UsuarioController.js";
 import __dirname from "../utils/pathUtils.js";
 
 class LivroController{
@@ -17,7 +19,7 @@ class LivroController{
     static async getById(req, res){
         try{
             const {id} = req.params;
-            const livro = Livro.findById(id);
+            const livro = await Livro.findById(id);
             if(!livro){
                 return res.status(404).json({message: 'Livro não encontrado!'});
             }
@@ -76,37 +78,50 @@ class LivroController{
         }
     }
 
-    static async deleteLivro(req, res){
-        try{
-            const {id} = req.params;
-            const livroDeletado = await Livro.delete(id);
-            if(!livroDeletado){
+    static async deleteLivro(req, res) {
+        try {
+            const { id } = req.params;
+            const livroDeletado = await Livro.findById(id);
+            if (!livroDeletado) {
                 return res.status(404).json({ message: "Livro não encontrado!" });
             }
-            return res.status(201).json({message: "Livro removido com sucesso!"});
-        }catch(error){
-            console.error("Erro ao remover Livro:", error);
-            return res.status(500).json({ message: "Erro interno ao remover Livro!." });
+
+            const usuarios = await Usuario.findAll({ "livros.livro": id });
+
+            for (const usuario of usuarios) {
+                usuario.livros = usuario.livros.filter(
+                    (l) => l.livro.toString() !== id
+                );
+                await usuario.save({ validateBeforeSave: false });
+            }
+            await Livro.delete(id);
+
+            return res.status(200).json({
+                message: "Livro removido com sucesso e avaliações dos usuários foram excluídas!",
+            });
+        } catch (error) {
+            console.error("Erro ao remover livro:", error);
+            return res.status(500).json({ message: "Erro interno ao remover livro!" });
         }
     }
+
 
     static async getLivrosByCategoria(req, res) {
-    try {
-        const { categoriaId } = req.params;
+        try {
+            const { categoriaId } = req.params;
 
-        const categoriaExiste = await Categoria.findById(categoriaId);
-        if (!categoriaExiste) {
-            return res.status(404).json({ message: "Categoria não encontrada!" });
+            const categoriaExiste = await Categoria.findById(categoriaId);
+            if (!categoriaExiste) {
+                return res.status(404).json({ message: "Categoria não encontrada!" });
+            }
+
+            const livros = await Livro.findByCategoria(categoriaId);
+            return res.json(livros);
+        } catch (error) {
+            console.error("Erro ao buscar livros por categoria:", error);
+            return res.status(500).json({ message: "Erro interno ao buscar livros por categoria" });
         }
-
-        const livros = await Livro.findByCategoria(categoriaId);
-        return res.json(livros);
-    } catch (error) {
-        console.error("Erro ao buscar livros por categoria:", error);
-        return res.status(500).json({ message: "Erro interno ao buscar livros por categoria" });
     }
-}
-
 }
 
 export default LivroController;

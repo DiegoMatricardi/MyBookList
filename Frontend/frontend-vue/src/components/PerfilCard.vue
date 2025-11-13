@@ -1,30 +1,32 @@
 <template>
   <div class="perfil-page">
     <h1>Meu Perfil</h1>
+
     <div v-if="usuario" class="perfil-info">
-    <div class="user-header">
+      <div class="user-header">
         <div class="avatar">{{ initials }}</div>
         <h2>{{ usuario.nome }}</h2>
-    </div>
-    <div class="user-details">
+      </div>
+
+      <div class="user-details">
         <p><strong>Email:</strong> {{ usuario.email }}</p>
         <p><strong>CPF:</strong> {{ usuario.cpf }}</p>
         <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
-    </div>
-    <div class="user-books" v-if=" livros && usuario.livros.length">
+      </div>
+
+      <div class="user-books" v-if="livros.length">
         <h3>Meus Livros</h3>
         <ul>
-        <li v-for="(livro,index) in livros" :key="index">
-            <strong>{{ livro.nome }}</strong> - {{ usuario.livros[index].nota }} ⭐
-        </li>
+          <li v-for="(item, index) in livros" :key="index">
+            <strong>{{ item.livro.nome }}</strong> - {{ item.nota }} ⭐
+          </li>
         </ul>
-    </div>
+      </div>
 
-    <div v-else>
+      <div v-else>
         <p>Você ainda não possui livros cadastrados.</p>
+      </div>
     </div>
-    </div>
-
   </div>
 </template>
 
@@ -36,15 +38,8 @@ export default {
   data() {
     return {
       usuario: null,
-      livros:[]
+      livros: []
     };
-  },watch:{
-    usuario:{
-      handler(){
-         this.searchbooks();
-      },
-      immediate:true
-    }
   },
   computed: {
     initials() {
@@ -56,33 +51,51 @@ export default {
         .toUpperCase();
     }
   },
-  created() {
+  async created() {
+    // Pega o usuário do localStorage para ter o _id
     const user = localStorage.getItem("usuario");
     if (!user) {
       this.$router.push("/login");
     } else {
       this.usuario = JSON.parse(user);
+      await this.carregarUsuario(); // Busca os dados atualizados do backend
     }
   },
-  methods:{
-    async searchbooks(){
-    try{
-      const livro=this.usuario.livros;
-      console.log(livro[0].livro)
-      for(let i=0;i<livro.length;i++){
-        const resp=await axiosInstance.get(`/livro/${livro[i].livro}`)
-        this.livros.push(resp.data);
+  methods: {
+    async carregarUsuario() {
+      try {
+        // 1️⃣ Busca usuário atualizado do backend
+        const resp = await axiosInstance.get(`/usuario/${this.usuario._id}`);
+        this.usuario = resp.data;
+
+        // Atualiza o localStorage para manter sincronizado
+        localStorage.setItem("usuario", JSON.stringify(this.usuario));
+
+        // 2️⃣ Busca os livros com a nota
+        await this.buscarLivros();
+      } catch (err) {
+        console.error("Erro ao carregar usuário:", err);
       }
-      console.log(this.livros[0].nome);
-      return this.livros;
-      }
-      catch(err){
+    },
+    async buscarLivros() {
+      try {
+        const livrosComNota = [];
+
+        for (const item of this.usuario.livros) {
+          const resp = await axiosInstance.get(`/livro/${item.livro}`);
+          livrosComNota.push({
+            livro: resp.data,
+            nota: item.nota || 0
+          });
+        }
+
+        this.livros = livrosComNota;
+      } catch (err) {
         console.error("Erro ao buscar livros:", err);
-        return [];
+        this.livros = [];
       }
+    }
   }
-  }
-  
 };
 </script>
 
@@ -156,13 +169,18 @@ export default {
 .user-books ul {
   list-style: none;
   padding: 0;
+  display: flex;           
+  flex-wrap: wrap;         
+  gap: 15px;              
 }
 
 .user-books li {
   padding: 10px 15px;
-  margin-bottom: 8px;
   background: #222;
   border-radius: 8px;
+  min-width: 200px;        
+  flex: 1 1 200px;         
+  text-align: center;
   transition: 0.2s;
 }
 

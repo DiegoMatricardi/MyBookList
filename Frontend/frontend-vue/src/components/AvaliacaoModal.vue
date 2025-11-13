@@ -27,6 +27,7 @@
 
 <script>
 import axios from "axios";
+import { eventBus } from '@/services/eventBus';
 
 export default {
   props: {
@@ -54,7 +55,7 @@ export default {
             `http://localhost:3000/usuario/${this.usuario._id}/avaliar/${this.livro._id}`,
             { nota: this.nota }
         );
-
+        eventBus.update = !eventBus.update;
         alert("Avaliação enviada com sucesso!");
         this.$emit("avaliado");
         this.$emit("fechar");
