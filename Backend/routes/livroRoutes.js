@@ -9,5 +9,6 @@ router.post("/livro", LivroController.createLivro);
 router.put("/livro/:id", LivroController.updateLivro);
 router.delete("/livro/:id", LivroController.deleteLivro);
 router.get("/livro/categoria/:id", LivroController.getLivrosByCategoria);
+router.get("/livro/curiosidade/:id", LivroController.getcuriosidade);
 
 export default router;

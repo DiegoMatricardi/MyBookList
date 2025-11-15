@@ -4,14 +4,18 @@
 
     <div class="content">
       <h1>Bem-vindo, {{ usuario?.nome || "Usuário" }}</h1>
+
+      <!-- adiciona a página de curiosidade do livro aqui -->
+      <CuriosidadeLivro />
     </div>
   </div>
 </template>
 
 <script>
     import Navbar from "../components/AppNavbar.vue";
+import CuriosidadeLivro from "../components/CuriosidadeLivro.vue";
     export default {
-        components: { Navbar },
+        components: { Navbar, CuriosidadeLivro },
         data() {
             return {
             usuario: null

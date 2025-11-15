@@ -6,26 +6,36 @@
       <PerfilCard
         v-if="usuario"
         :usuario="usuario"
-        @editar="editarPerfil"
+        @editar="showEditModal = true"
       />
 
       <div v-else>
         <p>Usuário não encontrado. Faça login novamente.</p>
       </div>
+
+      <!-- Modal de edição -->
+      <UpdateUsuario
+        v-if="showEditModal"
+        :usuario="usuario"
+        @close="showEditModal = false"
+        @saved="onUsuarioSaved"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import Navbar from "../components/AppNavbar.vue";
 import PerfilCard from "@/components/PerfilCard.vue";
+import UpdateUsuario from "@/components/UpdateUsuario.vue";
+import Navbar from "../components/AppNavbar.vue";
 
 export default {
   name: "PerfilView",
-  components: { Navbar, PerfilCard },
+  components: { Navbar, PerfilCard, UpdateUsuario },
   data() {
     return {
-      usuario: null
+      usuario: null,
+      showEditModal: false
     };
   },
   created() {
@@ -37,8 +47,11 @@ export default {
     }
   },
   methods: {
-    editarPerfil() {
-      alert("Função de editar ainda não implementada 😉");
+    onUsuarioSaved(updatedUser) {
+      // atualiza local e fecha modal
+      this.usuario = updatedUser;
+      localStorage.setItem("usuario", JSON.stringify(this.usuario));
+      this.showEditModal = false;
     }
   }
 };

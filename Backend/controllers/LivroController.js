@@ -4,6 +4,7 @@ import Usuario from "../models/usuario.js";
 import Categoria from "../models/categoria.js";
 import UsuarioController from "./UsuarioController.js";
 import __dirname from "../utils/pathUtils.js";
+import curiosidadeLivro from "../services/geminiService.js";
 
 class LivroController{
     static async getAllLivros(req, res){
@@ -120,6 +121,24 @@ class LivroController{
         } catch (error) {
             console.error("Erro ao buscar livros por categoria:", error);
             return res.status(500).json({ message: "Erro interno ao buscar livros por categoria" });
+        }
+    }
+    static async getcuriosidade(req, res) {
+        try{
+            const {id} = req.params;
+            const livro = await Livro.findById(id);
+            if(!livro){
+                return res.status(404).json({message: 'Livro não encontrado!'});
+            }
+            const curiosidade = await curiosidadeLivro(livro.nome);
+
+            res.json({
+                livro: livro.capa,
+                curiosidade: curiosidade
+            });
+        }catch(error){
+            console.error("Erro ao buscar curiosidade do livro:", error);
+            return res.status(500).json({ message: "Erro interno ao buscar curiosidade do livro" });
         }
     }
 }

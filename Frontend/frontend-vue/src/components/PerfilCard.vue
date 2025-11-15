@@ -3,6 +3,11 @@
     <h1>Meu Perfil</h1>
 
     <div v-if="usuario" class="perfil-info">
+      <!-- ADICIONADO: botão de editar -->
+      <div class="perfil-actions">
+        <button class="edit-btn" @click="$emit('editar')">Editar perfil</button>
+      </div>
+
       <div class="user-header">
         <div class="avatar">{{ initials }}</div>
         <h2>{{ usuario.nome }}</h2>
@@ -64,14 +69,10 @@ export default {
   methods: {
     async carregarUsuario() {
       try {
-        // 1️⃣ Busca usuário atualizado do backend
-        const resp = await axiosInstance.get(`/usuario/${this.usuario._id}`);
+        // Timeout guard para a requisição do usuário também (8s)
+        const resp = await this.requestWithTimeout(() => axiosInstance.get(`/usuario/${this.usuario._id}`), 8000);
         this.usuario = resp.data;
-
-        // Atualiza o localStorage para manter sincronizado
         localStorage.setItem("usuario", JSON.stringify(this.usuario));
-
-        // 2️⃣ Busca os livros com a nota
         await this.buscarLivros();
       } catch (err) {
         console.error("Erro ao carregar usuário:", err);
@@ -79,21 +80,57 @@ export default {
     },
     async buscarLivros() {
       try {
-        const livrosComNota = [];
-
-        for (const item of this.usuario.livros) {
-          const resp = await axiosInstance.get(`/livro/${item.livro}`);
-          livrosComNota.push({
-            livro: resp.data,
-            nota: item.nota || 0
-          });
+        if (!this.usuario.livros || !this.usuario.livros.length) {
+          this.livros = [];
+          return;
         }
+
+        // cria promises paralelas com timeout por requisição
+        const promises = this.usuario.livros.map(item =>
+          this.requestWithTimeout(() => axiosInstance.get(`/livro/${item.livro}`), 8000)
+            .then(resp => ({ status: 'fulfilled', value: { livro: resp.data, nota: item.nota || 0 } }))
+            .catch(err => ({ status: 'rejected', reason: err, item }))
+        );
+
+        const results = await Promise.all(promises);
+
+        // filtra apenas as requisições bem-sucedidas
+        const livrosComNota = results
+          .filter(r => r && r.status === 'fulfilled')
+          .map(r => r.value);
 
         this.livros = livrosComNota;
       } catch (err) {
         console.error("Erro ao buscar livros:", err);
         this.livros = [];
       }
+    },
+
+    // Helper: executa uma função que retorna uma Promise (ex: axios) com timeout
+    requestWithTimeout(fn, ms = 8000) {
+      return new Promise((resolve, reject) => {
+        let finished = false;
+
+        const timer = setTimeout(() => {
+          if (finished) return;
+          finished = true;
+          reject(new Error('Timeout'));
+        }, ms);
+
+        fn()
+          .then(res => {
+            if (finished) return;
+            finished = true;
+            clearTimeout(timer);
+            resolve(res);
+          })
+          .catch(err => {
+            if (finished) return;
+            finished = true;
+            clearTimeout(timer);
+            reject(err);
+          });
+      });
     }
   }
 };
@@ -121,6 +158,26 @@ export default {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+}
+
+.perfil-actions {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.edit-btn {
+  background: transparent;
+  color: #9fa8ff;
+  border: 1px solid #4d55eb;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.edit-btn:hover {
+  background: #4d55eb;
+  color: #fff;
 }
 
 .user-header {

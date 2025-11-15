@@ -1,7 +1,5 @@
-import path from "path";
-import Usuario from "../models/usuario.js";
 import Livro from "../models/livros.js";
-import __dirname from "../utils/pathUtils.js";
+import Usuario from "../models/usuario.js";
 
 class UsuarioController {
   static async getAllUsuarios(req, res) {
@@ -17,7 +15,7 @@ class UsuarioController {
   static async getById(req, res) {
     try {
       const { id } = req.params;
-      const usuarioExiste = await Usuario.findById(id); 
+      const usuarioExiste = await Usuario.findById(id);
       if (!usuarioExiste) {
         return res.status(404).json({ message: "Usuário não encontrado!" });
       }
@@ -53,9 +51,12 @@ class UsuarioController {
     try {
       const { id } = req.params;
       const dadosAtualizados = req.body;
-      const usuarioAtualizado = await Usuario.findByIdAndUpdate(id, dadosAtualizados, {
-        new: true,
-      }); 
+      const usuario = await Usuario.findById(id);
+      if (!usuario) {
+        return res.status(404).json({ message: "Usuário não encontrado!" });
+      }
+
+      const usuarioAtualizado = await Usuario.update(id, dadosAtualizados);
       if (!usuarioAtualizado) {
         return res.status(404).json({ message: "Usuário não encontrado!" });
       }
@@ -90,15 +91,15 @@ class UsuarioController {
       }
 
       const usuario = await Usuario.findById(usuarioId);
-      if (!usuario) 
+      if (!usuario)
         return res.status(404).json({ message: "Usuário não encontrado!" });
 
       const livro = await Livro.findById(livroId);
-      if (!livro) 
+      if (!livro)
         return res.status(404).json({ message: "Livro não encontrado!" });
 
       livro.notas.push(nota);
-      if (!livro.pessoas.includes(usuarioId)) 
+      if (!livro.pessoas.includes(usuarioId))
         livro.pessoas.push(usuarioId);
       await livro.save();
 
